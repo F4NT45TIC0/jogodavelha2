@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jogo da Velha 2</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section id="lobbyView" class="lobby-panel">
+        <div class="brand-row">
+          <span class="brand-mark">J2</span>
+          <div>
+            <h1>Jogo da Velha 2</h1>
+            <p>Ultimate Tic-Tac-Toe online em tempo real</p>
+          </div>
+        </div>
+
+        <form id="lobbyForm" class="lobby-form">
+          <label for="nicknameInput">Apelido</label>
+          <input id="nicknameInput" name="nickname" maxlength="24" autocomplete="nickname" placeholder="Seu nome" />
+
+          <div class="room-entry">
+            <label for="roomInput">Código da sala</label>
+            <div class="room-entry-line">
+              <input id="roomInput" name="room" maxlength="8" autocomplete="off" placeholder="ABCDE" />
+              <button id="joinRoomButton" type="submit">Entrar</button>
+            </div>
+          </div>
+
+          <button id="createRoomButton" class="primary-action" type="button">Criar sala</button>
+          <p id="lobbyError" class="error-line" role="alert"></p>
+        </form>
+      </section>
+
+      <section id="gameView" class="game-layout" hidden>
+        <header class="game-header">
+          <div class="room-block">
+            <button id="backButton" class="icon-button" type="button" title="Voltar ao início" aria-label="Voltar ao início">←</button>
+            <div>
+              <span class="label">Sala</span>
+              <strong id="roomCode">-----</strong>
+            </div>
+            <button id="copyLinkButton" class="small-button" type="button">Copiar link</button>
+          </div>
+
+          <div class="player-row">
+            <div id="playerX" class="player-pill x">
+              <span>X</span>
+              <strong>Aguardando</strong>
+              <small>offline</small>
+            </div>
+            <div id="playerO" class="player-pill o">
+              <span>O</span>
+              <strong>Aguardando</strong>
+              <small>offline</small>
+            </div>
+          </div>
+        </header>
+
+        <section class="status-strip">
+          <div>
+            <span class="label">Status</span>
+            <strong id="statusText">Conectando...</strong>
+          </div>
+          <div>
+            <span class="label">Próxima jogada</span>
+            <strong id="targetText">Livre</strong>
+          </div>
+        </section>
+
+        <section class="board-wrap" aria-label="Tabuleiro principal">
+          <div id="mainBoard" class="main-board"></div>
+        </section>
+
+        <footer class="game-actions">
+          <p id="gameError" class="error-line" role="alert"></p>
+          <div>
+            <button id="rematchButton" class="small-button" type="button" hidden>Pedir revanche</button>
+            <button id="newRoomButton" class="primary-action compact" type="button" hidden>Nova sala</button>
+          </div>
+        </footer>
+      </section>
+    </main>
+
+    <script src="/runtime-config.js"></script>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="/client.js"></script>
+  </body>
+</html>

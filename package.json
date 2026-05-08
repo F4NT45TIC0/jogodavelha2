@@ -1,0 +1,22 @@
+{
+  "name": "jogo-da-velha-2",
+  "version": "1.0.0",
+  "description": "Jogo da Velha 2: jogo da velha estratégico online em tempo real.",
+  "main": "server.js",
+  "scripts": {
+    "build": "node scripts/write-runtime-config.js",
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "node test/game.test.js && node test/realtime.test.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5"
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "devDependencies": {
+    "socket.io-client": "^4.7.5"
+  }
+}

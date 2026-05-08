@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: jogo-da-velha-2-api
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: CLIENT_ORIGIN
+        value: "*"
