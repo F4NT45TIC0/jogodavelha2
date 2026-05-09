@@ -37,12 +37,13 @@
       <section id="gameView" class="game-layout" hidden>
         <header class="game-header">
           <div class="room-block">
-            <button id="backButton" class="icon-button" type="button" title="Voltar ao início" aria-label="Voltar ao início">←</button>
+            <button id="backButton" class="icon-button" type="button" title="Voltar ao início" aria-label="Voltar ao início">&larr;</button>
             <div>
               <span class="label">Sala</span>
               <strong id="roomCode">-----</strong>
             </div>
             <button id="copyLinkButton" class="small-button" type="button">Copiar link</button>
+            <button id="themeToggleButton" class="small-button ghost" type="button">Tema claro</button>
           </div>
 
           <div class="player-row">
@@ -70,17 +71,37 @@
           </div>
         </section>
 
-        <section class="board-wrap" aria-label="Tabuleiro principal">
-          <div id="mainBoard" class="main-board"></div>
-        </section>
+        <section class="play-grid">
+          <section class="board-panel">
+            <div class="board-wrap" aria-label="Tabuleiro principal">
+              <div id="mainBoard" class="main-board"></div>
+            </div>
 
-        <footer class="game-actions">
-          <p id="gameError" class="error-line" role="alert"></p>
-          <div>
-            <button id="rematchButton" class="small-button" type="button" hidden>Pedir revanche</button>
-            <button id="newRoomButton" class="primary-action compact" type="button" hidden>Nova sala</button>
-          </div>
-        </footer>
+            <footer class="game-actions">
+              <p id="gameError" class="error-line" role="alert"></p>
+              <div>
+                <button id="rematchButton" class="small-button" type="button" hidden>Pedir revanche</button>
+                <button id="newRoomButton" class="primary-action compact" type="button" hidden>Nova sala</button>
+              </div>
+            </footer>
+          </section>
+
+          <aside class="chat-panel" aria-label="Chat da sala">
+            <header class="chat-header">
+              <div>
+                <span class="label">Chat</span>
+                <strong>Conversa da partida</strong>
+              </div>
+            </header>
+
+            <div id="chatMessages" class="chat-messages" aria-live="polite"></div>
+
+            <form id="chatForm" class="chat-form">
+              <input id="chatInput" maxlength="180" autocomplete="off" placeholder="Mensagem rápida..." />
+              <button id="chatSendButton" class="primary-action compact" type="submit">Enviar</button>
+            </form>
+          </aside>
+        </section>
       </section>
     </main>
 

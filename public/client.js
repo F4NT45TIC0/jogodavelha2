@@ -4,6 +4,7 @@ const socket = io(socketUrl, socketOptions);
 
 const STORAGE_KEY = 'jogo-da-velha-2:sessions';
 const ACTIVE_ROOM_KEY = 'jogo-da-velha-2:active-room';
+const THEME_KEY = 'jogo-da-velha-2:theme';
 const BOARD_NAMES = [
   'superior esquerdo',
   'superior central',
@@ -26,6 +27,7 @@ const lobbyError = document.querySelector('#lobbyError');
 const roomCode = document.querySelector('#roomCode');
 const copyLinkButton = document.querySelector('#copyLinkButton');
 const backButton = document.querySelector('#backButton');
+const themeToggleButton = document.querySelector('#themeToggleButton');
 const playerX = document.querySelector('#playerX');
 const playerO = document.querySelector('#playerO');
 const statusText = document.querySelector('#statusText');
@@ -34,14 +36,20 @@ const mainBoard = document.querySelector('#mainBoard');
 const gameError = document.querySelector('#gameError');
 const rematchButton = document.querySelector('#rematchButton');
 const newRoomButton = document.querySelector('#newRoomButton');
+const chatMessages = document.querySelector('#chatMessages');
+const chatForm = document.querySelector('#chatForm');
+const chatInput = document.querySelector('#chatInput');
 
 let state = null;
 let session = null;
 let messageTimer = null;
+let lastChatMessageId = null;
 
 init();
 
 function init() {
+  applyTheme(localStorage.getItem(THEME_KEY) || 'dark');
+
   const urlRoom = getRoomFromUrl();
   const activeRoom = urlRoom || localStorage.getItem(ACTIVE_ROOM_KEY);
   const savedSession = activeRoom ? getSavedSession(activeRoom) : null;
@@ -97,7 +105,21 @@ function init() {
   });
 
   backButton.addEventListener('click', () => {
+    const roomId = session?.roomId;
+
+    leaveCurrentRoom();
+    if (roomId) {
+      clearSavedSession(roomId);
+    }
+    session = null;
+    state = null;
+    clearRoomUrl();
     showLobby();
+  });
+
+  themeToggleButton.addEventListener('click', () => {
+    const nextTheme = document.body.classList.contains('theme-light') ? 'dark' : 'light';
+    applyTheme(nextTheme);
   });
 
   rematchButton.addEventListener('click', () => {
@@ -106,6 +128,11 @@ function init() {
 
   newRoomButton.addEventListener('click', () => {
     createRoom();
+  });
+
+  chatForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    sendChatMessage();
   });
 
   socket.on('connect', () => {
@@ -147,6 +174,10 @@ function init() {
   });
 
   socket.on('game:error', (message) => {
+    showGameMessage(message);
+  });
+
+  socket.on('chat:error', (message) => {
     showGameMessage(message);
   });
 }
@@ -270,6 +301,7 @@ function render() {
   renderPlayers();
   renderStatus();
   renderBoard();
+  renderChat();
   renderActions();
 }
 
@@ -382,6 +414,54 @@ function renderBoard() {
   });
 }
 
+function renderChat() {
+  const messages = state.chatMessages || [];
+  const lastMessage = messages[messages.length - 1] || null;
+  const shouldScroll = lastMessage?.id !== lastChatMessageId;
+
+  chatMessages.innerHTML = '';
+
+  if (!messages.length) {
+    const empty = document.createElement('p');
+    empty.className = 'chat-empty';
+    empty.textContent = 'O chat da sala aparece aqui.';
+    chatMessages.appendChild(empty);
+  } else {
+    messages.forEach((message) => {
+      const item = document.createElement('article');
+      item.className = 'chat-message';
+      item.classList.toggle('mine', message.symbol === session?.symbol);
+      item.classList.toggle('x', message.symbol === 'X');
+      item.classList.toggle('o', message.symbol === 'O');
+
+      const meta = document.createElement('div');
+      meta.className = 'chat-meta';
+
+      const name = document.createElement('strong');
+      name.textContent = `${message.nickname} (${message.symbol})`;
+
+      const time = document.createElement('time');
+      time.dateTime = new Date(message.sentAt).toISOString();
+      time.textContent = formatMessageTime(message.sentAt);
+
+      const text = document.createElement('p');
+      text.textContent = message.text;
+
+      meta.append(name, time);
+      item.append(meta, text);
+      chatMessages.appendChild(item);
+    });
+  }
+
+  chatInput.disabled = !session;
+  chatForm.querySelector('button').disabled = !session;
+  lastChatMessageId = lastMessage?.id || null;
+
+  if (shouldScroll) {
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+}
+
 function renderActions() {
   const finished = state.status === 'finished';
   rematchButton.hidden = !finished;
@@ -393,6 +473,30 @@ function renderActions() {
 
   const wantsRematch = state.players[session.symbol]?.wantsRematch;
   rematchButton.textContent = wantsRematch ? 'Aguardando revanche' : 'Pedir revanche';
+}
+
+function sendChatMessage() {
+  const text = chatInput.value.trim();
+
+  if (!text) {
+    return;
+  }
+
+  if (!session) {
+    showGameMessage('Entre em uma sala para conversar.');
+    return;
+  }
+
+  socket.emit('chat:send', { text });
+  chatInput.value = '';
+}
+
+function leaveCurrentRoom() {
+  if (!session) {
+    return;
+  }
+
+  socket.emit('room:leave');
 }
 
 function showLobby() {
@@ -422,6 +526,24 @@ function showGameMessage(message, notice = false) {
     gameError.textContent = '';
     gameError.classList.remove('notice');
   }, notice ? 2200 : 3200);
+}
+
+function applyTheme(theme) {
+  const normalizedTheme = theme === 'light' ? 'light' : 'dark';
+
+  document.body.classList.toggle('theme-light', normalizedTheme === 'light');
+  localStorage.setItem(THEME_KEY, normalizedTheme);
+
+  if (themeToggleButton) {
+    themeToggleButton.textContent = normalizedTheme === 'light' ? 'Tema dark' : 'Tema claro';
+  }
+}
+
+function formatMessageTime(value) {
+  return new Intl.DateTimeFormat('pt-BR', {
+    hour: '2-digit',
+    minute: '2-digit'
+  }).format(new Date(value));
 }
 
 function getRoomFromUrl() {

@@ -52,6 +52,18 @@ async function run() {
   assert.equal(joined.player.symbol, 'O');
   assert.equal(joined.room.status, 'playing');
 
+  const chatForX = waitForUpdate(playerX, (room) =>
+    room.chatMessages.some((message) => message.text === 'Boa partida!')
+  );
+  const chatForO = waitForUpdate(playerO, (room) =>
+    room.chatMessages.some((message) => message.text === 'Boa partida!')
+  );
+  playerX.emit('chat:send', { text: 'Boa partida!' });
+
+  const [chatRoomX, chatRoomO] = await Promise.all([chatForX, chatForO]);
+  assert.equal(chatRoomX.chatMessages.at(-1).symbol, 'X');
+  assert.deepEqual(chatRoomX.chatMessages, chatRoomO.chatMessages);
+
   const updateForX = waitForUpdate(playerX, (room) => room.miniBoards[4][2] === 'X');
   const updateForO = waitForUpdate(playerO, (room) => room.miniBoards[4][2] === 'X');
   playerX.emit('game:move', { boardIndex: 4, cellIndex: 2 });

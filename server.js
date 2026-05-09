@@ -17,6 +17,8 @@ const EMPTY_ROOM_TTL_MS = readDuration('EMPTY_ROOM_TTL_MS', 20 * 60 * 1000);
 const ACTIVE_ROOM_TTL_MS = readDuration('ACTIVE_ROOM_TTL_MS', 2 * 60 * 60 * 1000);
 const FINISHED_ROOM_TTL_MS = readDuration('FINISHED_ROOM_TTL_MS', 60 * 60 * 1000);
 const ROOM_CLEANUP_INTERVAL_MS = readDuration('ROOM_CLEANUP_INTERVAL_MS', 5 * 60 * 1000);
+const MAX_CHAT_MESSAGES = 80;
+const CHAT_MAX_LENGTH = 180;
 
 const app = express();
 const server = http.createServer(app);
@@ -157,6 +159,58 @@ io.on('connection', (socket) => {
     emitRoom(room);
   });
 
+  socket.on('chat:send', (payload = {}) => {
+    const room = rooms.get(socket.data.roomId);
+    const symbol = socket.data.symbol;
+
+    if (!room || (symbol !== 'X' && symbol !== 'O') || !room.players[symbol]) {
+      socket.emit('chat:error', 'Entre em uma sala para conversar.');
+      return;
+    }
+
+    const text = cleanChatMessage(payload.text);
+    if (!text) {
+      socket.emit('chat:error', 'Digite uma mensagem antes de enviar.');
+      return;
+    }
+
+    room.chatMessages = room.chatMessages || [];
+    room.chatMessages.push({
+      id: createMessageId(),
+      symbol,
+      nickname: room.players[symbol].nickname,
+      text,
+      sentAt: Date.now()
+    });
+
+    if (room.chatMessages.length > MAX_CHAT_MESSAGES) {
+      room.chatMessages = room.chatMessages.slice(-MAX_CHAT_MESSAGES);
+    }
+
+    room.updatedAt = Date.now();
+    emitRoom(room);
+  });
+
+  socket.on('room:leave', () => {
+    const roomId = socket.data.roomId;
+    const symbol = socket.data.symbol;
+    const room = rooms.get(roomId);
+
+    if (roomId) {
+      socket.leave(roomId);
+    }
+
+    socket.data.roomId = null;
+    socket.data.symbol = null;
+
+    if (room && room.players[symbol] && !hasActiveSocketFor(room.roomId, symbol)) {
+      room.players[symbol].connected = false;
+      room.players[symbol].lastSeen = Date.now();
+      room.updatedAt = Date.now();
+      emitRoom(room);
+    }
+  });
+
   socket.on('disconnect', () => {
     const room = rooms.get(socket.data.roomId);
     const symbol = socket.data.symbol;
@@ -195,6 +249,10 @@ function createToken() {
   return crypto.randomUUID();
 }
 
+function createMessageId() {
+  return crypto.randomBytes(8).toString('hex');
+}
+
 function createPlayer(symbol, nickname, token) {
   return {
     symbol,
@@ -211,6 +269,13 @@ function cleanNickname(value) {
     .trim()
     .replace(/\s+/g, ' ')
     .slice(0, 24);
+}
+
+function cleanChatMessage(value) {
+  return String(value || '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, CHAT_MAX_LENGTH);
 }
 
 function cleanRoomId(value) {

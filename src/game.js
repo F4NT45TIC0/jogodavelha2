@@ -22,6 +22,7 @@ function createGameState(roomId) {
     nextBoardIndex: null,
     winner: null,
     status: 'waiting',
+    chatMessages: [],
     rematchRequests: {
       X: false,
       O: false
@@ -170,6 +171,7 @@ function publicRoomState(room) {
     miniBoards: room.miniBoards,
     nextBoardIndex: room.nextBoardIndex,
     availableBoards: getAvailableBoards(room),
+    chatMessages: room.chatMessages || [],
     winner: room.winner,
     status: room.status
   };
