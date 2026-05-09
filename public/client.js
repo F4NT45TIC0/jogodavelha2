@@ -132,6 +132,20 @@ function init() {
     render();
   });
 
+  socket.on('room:closed', (payload = {}) => {
+    const closedRoomId = payload.roomId || state?.roomId || session?.roomId;
+
+    if (closedRoomId) {
+      clearSavedSession(closedRoomId);
+    }
+
+    state = null;
+    session = null;
+    clearRoomUrl();
+    showLobby();
+    showLobbyError(payload.reason || 'Essa sala foi encerrada automaticamente.');
+  });
+
   socket.on('game:error', (message) => {
     showGameMessage(message);
   });
@@ -176,7 +190,14 @@ function joinRoom(roomIdInput, nicknameInputValue, tokenInput, silent = false) {
 
 function handleRoomResponse(response, silent = false) {
   if (!response || !response.ok) {
-    if (!silent) {
+    if (silent && session?.roomId) {
+      clearSavedSession(session.roomId);
+      session = null;
+      state = null;
+      clearRoomUrl();
+      showLobby();
+      showLobbyError(response?.error || 'Essa sala não está mais disponível.');
+    } else if (!silent) {
       showLobbyError(response?.error || 'Não foi possível entrar na sala.');
     }
     return;
@@ -420,6 +441,12 @@ function updateUrl(roomId) {
   window.history.replaceState({}, '', url);
 }
 
+function clearRoomUrl() {
+  const url = new URL(window.location.href);
+  url.searchParams.delete('room');
+  window.history.replaceState({}, '', url);
+}
+
 function normalizeRoom(value) {
   return String(value || '')
     .trim()
@@ -438,6 +465,18 @@ function saveSession(nextSession) {
   sessions[nextSession.roomId] = nextSession;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions));
   localStorage.setItem(ACTIVE_ROOM_KEY, nextSession.roomId);
+}
+
+function clearSavedSession(roomId) {
+  const normalizedRoomId = normalizeRoom(roomId);
+  const sessions = readSessions();
+
+  delete sessions[normalizedRoomId];
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions));
+
+  if (localStorage.getItem(ACTIVE_ROOM_KEY) === normalizedRoomId) {
+    localStorage.removeItem(ACTIVE_ROOM_KEY);
+  }
 }
 
 function readSessions() {

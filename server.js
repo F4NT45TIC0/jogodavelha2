@@ -11,8 +11,12 @@ const {
 } = require('./src/game');
 
 const PORT = process.env.PORT || 3000;
-const ROOM_TTL_MS = 6 * 60 * 60 * 1000;
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || '*';
+const WAITING_ROOM_TTL_MS = readDuration('WAITING_ROOM_TTL_MS', 20 * 60 * 1000);
+const EMPTY_ROOM_TTL_MS = readDuration('EMPTY_ROOM_TTL_MS', 20 * 60 * 1000);
+const ACTIVE_ROOM_TTL_MS = readDuration('ACTIVE_ROOM_TTL_MS', 2 * 60 * 60 * 1000);
+const FINISHED_ROOM_TTL_MS = readDuration('FINISHED_ROOM_TTL_MS', 60 * 60 * 1000);
+const ROOM_CLEANUP_INTERVAL_MS = readDuration('ROOM_CLEANUP_INTERVAL_MS', 5 * 60 * 1000);
 
 const app = express();
 const server = http.createServer(app);
@@ -160,16 +164,7 @@ io.on('connection', (socket) => {
   });
 });
 
-setInterval(() => {
-  const now = Date.now();
-
-  for (const [roomId, room] of rooms) {
-    const hasConnections = ['X', 'O'].some((symbol) => hasActiveSocketFor(roomId, symbol));
-    if (!hasConnections && now - room.updatedAt > ROOM_TTL_MS) {
-      rooms.delete(roomId);
-    }
-  }
-}, 30 * 60 * 1000).unref();
+setInterval(cleanupRooms, ROOM_CLEANUP_INTERVAL_MS).unref();
 
 server.listen(PORT, () => {
   console.log(`Jogo da Velha 2 rodando em http://localhost:${PORT}`);
@@ -261,6 +256,53 @@ function emitRoom(room) {
   io.to(room.roomId).emit('room:update', publicRoomState(room));
 }
 
+function cleanupRooms() {
+  const now = Date.now();
+
+  for (const [roomId, room] of rooms) {
+    const connectedCount = countActiveSockets(roomId);
+    const idleFor = now - room.updatedAt;
+
+    if (connectedCount === 0 && idleFor > EMPTY_ROOM_TTL_MS) {
+      closeRoom(roomId, 'Sala removida por falta de jogadores conectados.');
+      continue;
+    }
+
+    if (room.status === 'waiting' && !room.players.O && now - room.createdAt > WAITING_ROOM_TTL_MS) {
+      closeRoom(roomId, 'Sala expirada porque nenhum adversário entrou.');
+      continue;
+    }
+
+    if (room.status === 'finished' && idleFor > FINISHED_ROOM_TTL_MS) {
+      closeRoom(roomId, 'Sala finalizada removida automaticamente.');
+      continue;
+    }
+
+    if (room.status === 'playing' && idleFor > ACTIVE_ROOM_TTL_MS) {
+      closeRoom(roomId, 'Partida removida por inatividade.');
+    }
+  }
+}
+
+function closeRoom(roomId, reason) {
+  const room = rooms.get(roomId);
+  if (!room) {
+    return;
+  }
+
+  io.to(roomId).emit('room:closed', { roomId, reason });
+
+  for (const connectedSocket of io.sockets.sockets.values()) {
+    if (connectedSocket.data.roomId === roomId) {
+      connectedSocket.leave(roomId);
+      connectedSocket.data.roomId = null;
+      connectedSocket.data.symbol = null;
+    }
+  }
+
+  rooms.delete(roomId);
+}
+
 function hasActiveSocketFor(roomId, symbol) {
   for (const connectedSocket of io.sockets.sockets.values()) {
     if (connectedSocket.data.roomId === roomId && connectedSocket.data.symbol === symbol) {
@@ -269,6 +311,18 @@ function hasActiveSocketFor(roomId, symbol) {
   }
 
   return false;
+}
+
+function countActiveSockets(roomId) {
+  let count = 0;
+
+  for (const connectedSocket of io.sockets.sockets.values()) {
+    if (connectedSocket.data.roomId === roomId) {
+      count += 1;
+    }
+  }
+
+  return count;
 }
 
 function sendReply(reply, payload) {
@@ -286,4 +340,9 @@ function parseOrigins(value) {
     .split(',')
     .map((origin) => origin.trim())
     .filter(Boolean);
+}
+
+function readDuration(name, fallback) {
+  const value = Number(process.env[name]);
+  return Number.isFinite(value) && value > 0 ? value : fallback;
 }

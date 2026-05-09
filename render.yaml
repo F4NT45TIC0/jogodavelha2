@@ -11,3 +11,13 @@ services:
         value: 20
       - key: CLIENT_ORIGIN
         value: "*"
+      - key: WAITING_ROOM_TTL_MS
+        value: 1200000
+      - key: EMPTY_ROOM_TTL_MS
+        value: 1200000
+      - key: ACTIVE_ROOM_TTL_MS
+        value: 7200000
+      - key: FINISHED_ROOM_TTL_MS
+        value: 3600000
+      - key: ROOM_CLEANUP_INTERVAL_MS
+        value: 300000
