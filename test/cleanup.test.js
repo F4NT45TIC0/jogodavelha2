@@ -9,10 +9,10 @@ const server = spawn(process.execPath, ['server.js'], {
   env: {
     ...process.env,
     PORT: String(port),
-    WAITING_ROOM_TTL_MS: '250',
-    EMPTY_ROOM_TTL_MS: '10000',
-    ACTIVE_ROOM_TTL_MS: '10000',
-    FINISHED_ROOM_TTL_MS: '10000',
+    ROOM_WAITING_TTL_MS: '250',
+    ROOM_EMPTY_TTL_MS: '10000',
+    ROOM_ACTIVE_TTL_MS: '10000',
+    ROOM_FINISHED_TTL_MS: '10000',
     ROOM_CLEANUP_INTERVAL_MS: '100'
   },
   stdio: ['ignore', 'pipe', 'pipe']

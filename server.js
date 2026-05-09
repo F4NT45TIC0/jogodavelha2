@@ -12,11 +12,11 @@ const {
 
 const PORT = process.env.PORT || 3000;
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || '*';
-const WAITING_ROOM_TTL_MS = readDuration('WAITING_ROOM_TTL_MS', 20 * 60 * 1000);
-const EMPTY_ROOM_TTL_MS = readDuration('EMPTY_ROOM_TTL_MS', 20 * 60 * 1000);
-const ACTIVE_ROOM_TTL_MS = readDuration('ACTIVE_ROOM_TTL_MS', 2 * 60 * 60 * 1000);
-const FINISHED_ROOM_TTL_MS = readDuration('FINISHED_ROOM_TTL_MS', 60 * 60 * 1000);
-const ROOM_CLEANUP_INTERVAL_MS = readDuration('ROOM_CLEANUP_INTERVAL_MS', 5 * 60 * 1000);
+const WAITING_ROOM_TTL_MS = readDuration('ROOM_WAITING_TTL_MS', 3 * 60 * 1000);
+const EMPTY_ROOM_TTL_MS = readDuration('ROOM_EMPTY_TTL_MS', 3 * 60 * 1000);
+const ACTIVE_ROOM_TTL_MS = readDuration('ROOM_ACTIVE_TTL_MS', 15 * 60 * 1000);
+const FINISHED_ROOM_TTL_MS = readDuration('ROOM_FINISHED_TTL_MS', 3 * 60 * 1000);
+const ROOM_CLEANUP_INTERVAL_MS = readDuration('ROOM_CLEANUP_INTERVAL_MS', 30 * 1000);
 const MAX_CHAT_MESSAGES = 80;
 const CHAT_MAX_LENGTH = 180;
 

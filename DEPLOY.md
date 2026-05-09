@@ -47,8 +47,8 @@ Depois que a Render gerar a URL publica do servico, configure a mesma URL como `
 
 O servidor remove salas automaticamente com estas variaveis:
 
-- `WAITING_ROOM_TTL_MS`: sala criada sem adversario, padrao 20 minutos.
-- `EMPTY_ROOM_TTL_MS`: sala sem jogadores conectados, padrao 20 minutos.
-- `ACTIVE_ROOM_TTL_MS`: partida em andamento sem atividade, padrao 2 horas.
-- `FINISHED_ROOM_TTL_MS`: partida finalizada, padrao 1 hora.
-- `ROOM_CLEANUP_INTERVAL_MS`: frequencia da limpeza, padrao 5 minutos.
+- `ROOM_WAITING_TTL_MS`: sala criada sem adversario, padrao 3 minutos.
+- `ROOM_EMPTY_TTL_MS`: sala sem jogadores conectados, padrao 3 minutos.
+- `ROOM_ACTIVE_TTL_MS`: partida em andamento sem atividade, padrao 15 minutos.
+- `ROOM_FINISHED_TTL_MS`: partida finalizada, padrao 3 minutos.
+- `ROOM_CLEANUP_INTERVAL_MS`: frequencia da limpeza, padrao 30 segundos.
