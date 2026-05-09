@@ -1,5 +1,6 @@
 const socketUrl = window.JDV2_CONFIG?.socketUrl || window.location.origin;
-const socket = io(socketUrl);
+const socketOptions = socketUrl === window.location.origin ? {} : { transports: ['websocket'] };
+const socket = io(socketUrl, socketOptions);
 
 const STORAGE_KEY = 'jogo-da-velha-2:sessions';
 const ACTIVE_ROOM_KEY = 'jogo-da-velha-2:active-room';
