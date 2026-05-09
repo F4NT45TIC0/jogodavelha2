@@ -31,7 +31,17 @@ const rooms = new Map();
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/healthz', (req, res) => {
-  res.json({ ok: true, rooms: rooms.size });
+  res.json({
+    ok: true,
+    rooms: rooms.size,
+    cleanup: {
+      waitingRoomTtlMs: WAITING_ROOM_TTL_MS,
+      emptyRoomTtlMs: EMPTY_ROOM_TTL_MS,
+      activeRoomTtlMs: ACTIVE_ROOM_TTL_MS,
+      finishedRoomTtlMs: FINISHED_ROOM_TTL_MS,
+      intervalMs: ROOM_CLEANUP_INTERVAL_MS
+    }
+  });
 });
 
 app.get('*', (req, res) => {
