@@ -636,9 +636,39 @@ body.theme-light .mini-result {
 }
 
 @media (max-width: 760px) {
+  body {
+    background: #050505;
+    color: #ffffff;
+  }
+
+  body.theme-light {
+    background: #ffffff;
+    color: #050505;
+  }
+
   .app-shell {
     padding: 12px;
     place-items: start center;
+  }
+
+  .lobby-panel,
+  .game-header,
+  .status-strip,
+  .board-panel,
+  .chat-panel {
+    border-color: #ffffff;
+    background: #101010;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+
+  body.theme-light .lobby-panel,
+  body.theme-light .game-header,
+  body.theme-light .status-strip,
+  body.theme-light .board-panel,
+  body.theme-light .chat-panel {
+    border-color: #050505;
+    background: #ffffff;
   }
 
   .lobby-panel {
@@ -653,6 +683,16 @@ body.theme-light .mini-result {
   .brand-mark {
     width: 48px;
     height: 48px;
+    border-color: #ffffff;
+    background: #ffffff;
+    color: #050505;
+    box-shadow: none;
+  }
+
+  body.theme-light .brand-mark {
+    border-color: #050505;
+    background: #050505;
+    color: #ffffff;
   }
 
   h1 {
@@ -674,18 +714,158 @@ body.theme-light .mini-result {
     flex: 1 1 130px;
   }
 
+  input {
+    min-height: 52px;
+    border: 2px solid #ffffff;
+    background: #000000;
+    color: #ffffff;
+    font-size: 1rem;
+  }
+
+  body.theme-light input {
+    border-color: #050505;
+    background: #ffffff;
+    color: #050505;
+  }
+
+  .primary-action,
+  .small-button,
+  .icon-button,
+  .room-entry-line button {
+    min-height: 48px;
+    border: 2px solid #ffffff;
+    background: #ffffff;
+    color: #050505;
+    box-shadow: none;
+  }
+
+  body.theme-light .primary-action,
+  body.theme-light .small-button,
+  body.theme-light .icon-button,
+  body.theme-light .room-entry-line button {
+    border-color: #050505;
+    background: #050505;
+    color: #ffffff;
+  }
+
+  .primary-action:hover,
+  .small-button:hover,
+  .icon-button:hover,
+  .room-entry-line button:hover {
+    border-color: #ffffff;
+    box-shadow: none;
+  }
+
+  body.theme-light .primary-action:hover,
+  body.theme-light .small-button:hover,
+  body.theme-light .icon-button:hover,
+  body.theme-light .room-entry-line button:hover {
+    border-color: #050505;
+  }
+
+  .label,
+  label,
+  .brand-row p,
+  .player-pill small,
+  .chat-meta,
+  .chat-empty {
+    color: #d6d6d6;
+  }
+
+  body.theme-light .label,
+  body.theme-light label,
+  body.theme-light .brand-row p,
+  body.theme-light .player-pill small,
+  body.theme-light .chat-meta,
+  body.theme-light .chat-empty {
+    color: #343434;
+  }
+
   .player-row {
     width: 100%;
     min-width: 0;
   }
 
+  .player-pill {
+    border: 2px solid #ffffff;
+    background: #000000;
+  }
+
+  body.theme-light .player-pill {
+    border-color: #050505;
+    background: #ffffff;
+  }
+
+  .player-pill > span,
+  .player-pill.x > span,
+  .player-pill.o > span {
+    border: 2px solid currentColor;
+    background: #ffffff;
+    color: #050505;
+  }
+
+  body.theme-light .player-pill > span,
+  body.theme-light .player-pill.x > span,
+  body.theme-light .player-pill.o > span {
+    background: #050505;
+    color: #ffffff;
+  }
+
+  .player-pill.active {
+    border-color: #ffffff;
+    box-shadow: inset 0 0 0 3px #ffffff;
+  }
+
+  body.theme-light .player-pill.active {
+    border-color: #050505;
+    box-shadow: inset 0 0 0 3px #050505;
+  }
+
+  .status-strip > div {
+    border-left-color: #ffffff;
+  }
+
+  body.theme-light .status-strip > div {
+    border-left-color: #050505;
+  }
+
+  .status-strip strong {
+    font-size: 1.18rem;
+  }
+
   .main-board {
+    width: min(96vw, 560px);
     gap: 7px;
     padding: 7px;
+    border: 3px solid #ffffff;
+    background: #ffffff;
+    box-shadow: none;
+  }
+
+  body.theme-light .main-board {
+    border-color: #050505;
+    background: #050505;
   }
 
   .mini-board {
     padding: 5px;
+    border: 2px solid #050505;
+    background: #ffffff;
+  }
+
+  body.theme-light .mini-board {
+    border-color: #ffffff;
+    background: #050505;
+  }
+
+  .mini-board.playable {
+    border-color: #050505;
+    box-shadow: inset 0 0 0 3px #050505;
+  }
+
+  body.theme-light .mini-board.playable {
+    border-color: #ffffff;
+    box-shadow: inset 0 0 0 3px #ffffff;
   }
 
   .mini-cells {
@@ -694,11 +874,92 @@ body.theme-light .mini-result {
 
   .cell {
     border-radius: 5px;
-    font-size: 1.05rem;
+    border: 2px solid #050505;
+    background: #ffffff;
+    color: #050505;
+    font-size: 1.12rem;
+    text-shadow: none;
+  }
+
+  body.theme-light .cell {
+    border-color: #ffffff;
+    background: #050505;
+    color: #ffffff;
+  }
+
+  .cell.mark-x,
+  .cell.mark-o {
+    color: #050505;
+    text-shadow: none;
+  }
+
+  body.theme-light .cell.mark-x,
+  body.theme-light .cell.mark-o {
+    color: #ffffff;
+  }
+
+  .cell.can-play:empty {
+    background: #f2f2f2;
+    box-shadow: inset 0 0 0 3px #050505;
+  }
+
+  body.theme-light .cell.can-play:empty {
+    background: #161616;
+    box-shadow: inset 0 0 0 3px #ffffff;
   }
 
   .mini-result {
+    inset: 5px;
+    background: rgba(0, 0, 0, 0.82);
+    color: #ffffff;
     font-size: 3.6rem;
+  }
+
+  body.theme-light .mini-result {
+    background: rgba(255, 255, 255, 0.86);
+    color: #050505;
+  }
+
+  .mini-result.x,
+  .mini-result.o,
+  .mini-result.draw {
+    color: #ffffff;
+  }
+
+  body.theme-light .mini-result.x,
+  body.theme-light .mini-result.o,
+  body.theme-light .mini-result.draw {
+    color: #050505;
+  }
+
+  .chat-message {
+    border: 2px solid #ffffff;
+    background: #000000;
+  }
+
+  body.theme-light .chat-message {
+    border-color: #050505;
+    background: #ffffff;
+  }
+
+  .chat-message.x,
+  .chat-message.o,
+  .chat-message.mine {
+    box-shadow: inset 4px 0 0 #ffffff;
+  }
+
+  body.theme-light .chat-message.x,
+  body.theme-light .chat-message.o,
+  body.theme-light .chat-message.mine {
+    box-shadow: inset 4px 0 0 #050505;
+  }
+
+  .error-line {
+    color: #ffffff;
+  }
+
+  body.theme-light .error-line {
+    color: #050505;
   }
 }
 
